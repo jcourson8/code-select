@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 434.61 267.38">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #231f20;
+        font-family: Novecentosanswide-Bold, 'Novecento sans wide';
+        font-size: 162.82px;
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <g id="Layer_1-2" data-name="Layer 1">
+    <text class="cls-1" transform="translate(42.78 191.21)"><tspan x="0" y="0">XML</tspan></text>
+    <path d="m403.62,0H31C13.88,0,0,13.87,0,30.99v205.4c0,17.12,13.88,30.99,31,30.99h372.62c17.12,0,30.99-13.87,30.99-30.99V30.99c0-17.12-13.87-30.99-30.99-30.99Zm10.11,236.75c0,5.41-4.39,9.8-9.8,9.8H30.68c-5.41,0-9.79-4.39-9.79-9.8V30.63c0-5.41,4.38-9.8,9.79-9.8h373.25c5.41,0,9.8,4.39,9.8,9.8v206.12Z"/>
+  </g>
+</svg>

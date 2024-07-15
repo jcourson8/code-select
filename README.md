@@ -1,5 +1,5 @@
 # CodeSelect
-Provide LLMs with the context of a project's structure and content, quickly!
+Provide LLMs with the context of a project's structure and content, quickly! Try it [here](code-select.vercel.app).
 
 It captures two aspects of your project:
 1. **Structure**: The hierarchical relationship between folders and files.

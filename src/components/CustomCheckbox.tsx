@@ -9,7 +9,7 @@ interface CustomCheckboxProps {
 const CustomCheckbox = (props: CustomCheckboxProps) => {
   return (
     <div
-      class="w-3 h-3 rounded-full border border-dark-border flex items-center justify-center cursor-pointer flex-shrink-0"
+      class="w-3 h-3 rounded-full border border-dark-textMuted flex items-center justify-center cursor-pointer flex-shrink-0"
       onClick={(e: MouseEvent) => {
         e.stopPropagation();
         props.onChange(!props.checked());

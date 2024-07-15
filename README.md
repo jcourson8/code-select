@@ -11,4 +11,6 @@ This tool follows a simple and intuitive principle:
 - If a folder is expanded and visible, its structure is included by default.
 - You can manually select items for exclusion or choose whether to include a file's contents.
 
+**All code is client-side and nothing is uploaded to a server.**
+
 May this tool help you share your projects's context effectively.

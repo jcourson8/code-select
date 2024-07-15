@@ -1,5 +1,5 @@
 # CodeSelect
-Provide LLMs with the context of a project's structure and content, quickly! Try it [here](code-select.vercel.app).
+Provide LLMs with the context of a project's structure and content, quickly! Try it [here](https://code-select.vercel.app).
 
 https://github.com/user-attachments/assets/3c7b78f3-d121-4cc1-b429-fe639e7fef84
 

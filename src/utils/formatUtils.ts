@@ -36,7 +36,7 @@ export const generateOutput = async (
   const processItem = async (item: FileItem, indent = ""): Promise<void> => {
     if (isVisuallyVisible(item, expandedFolders) && outputVisibleItems()[item.path]) {
       if (format === "MD") {
-        output += `${indent}- ${item.name}\n`;
+        output += `${indent}- ${item.name} (${item.path})\n`;
 
         if (selectedItems()[item.path] && item.type === "file") {
           const content = await getItemContent(item);
@@ -45,7 +45,7 @@ export const generateOutput = async (
         }
       } else if (format === "XML") {
         const tag = item.type === "folder" ? "folder" : "file";
-        output += `${indent}<${tag} name="${escapeXml(item.name)}">\n`;
+        output += `${indent}<${tag} name="${escapeXml(item.name)}" path="${escapeXml(item.path)}">\n`;
 
         if (selectedItems()[item.path] && item.type === "file") {
           const content = await getItemContent(item);

@@ -1,4 +1,4 @@
-import { createSignal, Show } from "solid-js";
+import { createSignal, Match, Show, Switch } from "solid-js";
 import OutputViewer from "./components/OutputViewer";
 import FileTree from "./components/FileTree";
 import CodeViewer from "./components/CodeViewer";
@@ -47,8 +47,23 @@ const FileSelector = () => {
     expandedFolders
   );
 
-  const [viewMode, setViewMode] = createSignal<"code" | "output">("output");
   const [dividerPos, setDividerPos] = createSignal(33);
+
+  const [viewMode, setViewMode] = createSignal<"code" | "output">("output");
+
+  const handleFileSelection = (item: FileItem) => {
+    if (item.type === "file") {
+      if (selectedFile() === item.path) {
+        // If the same file is clicked again, deselect it
+        selectFile(null);
+        setViewMode("output");
+      } else {
+        // Select the new file and switch to code view
+        selectFile(item);
+        setViewMode("code");
+      }
+    }
+  };
 
   const toggleViewMode = () => {
     setViewMode((prev) => (prev === "code" ? "output" : "code"));
@@ -76,7 +91,8 @@ const FileSelector = () => {
 
     const doDrag = (e: MouseEvent) => {
       const newLeftWidth = startLeftWidth + e.clientX - startX;
-      const containerWidth = (leftPanelRef!.parentNode as HTMLElement).offsetWidth;
+      const containerWidth = (leftPanelRef!.parentNode as HTMLElement)
+        .offsetWidth;
       const newLeftWidthPercent = (newLeftWidth / containerWidth) * 100;
       if (newLeftWidthPercent >= 18 && newLeftWidthPercent <= 82) {
         setDividerPos(newLeftWidthPercent);
@@ -93,7 +109,7 @@ const FileSelector = () => {
   };
 
   return (
-    <div class="h-screen flex flex-col bg-dark-background text-dark-text">
+    <div class="h-screen flex flex-col bg-dark-background text-dark-text text-sm">
       <div class="flex-grow flex overflow-hidden">
         {/* Left Panel */}
         <div
@@ -102,11 +118,8 @@ const FileSelector = () => {
           style={{ width: `${dividerPos()}%` }}
         >
           {/* Folder Selection */}
-          <div class="flex-shrink-0 p-2 flex justify-between items-center">
-            <label
-              for="folder-upload"
-              class="flex items-center cursor-pointer hover:bg-dark-buttonHover transition-colors p-2 rounded text-sm"
-            >
+          <div class="flex-shrink-0 p-2 hover:bg-dark-buttonHover cursor-pointer transition-colors flex justify-between items-center">
+            <label for="folder-upload" class="flex items-center rounded">
               <span class="text-dark-text">Choose a folder</span>
               <input
                 id="folder-upload"
@@ -121,23 +134,16 @@ const FileSelector = () => {
                 class="hidden"
               />
             </label>
-            <button
-              class="px-2 py-1 text-dark-text rounded hover:bg-dark-buttonHover text-xs border border-dark-border"
-              onClick={toggleViewMode}
-              title="Toggle view mode"
-            >
-              {viewMode() === "code" ? "Show Output" : "Show Code"}
-            </button>
           </div>
 
           {/* File Tree */}
           <FileTree
-            items={items()}
+            items={items}
             selectedFile={selectedFile}
             selectedItems={selectedItems}
             outputVisibleItems={outputVisibleItems}
             expandedFolders={expandedFolders}
-            onSelectFile={selectFile}
+            onSelectFile={handleFileSelection}
             onToggleFolder={toggleFolder}
             onToggleSelection={toggleSelection}
             onToggleOutputVisibility={toggleOutputVisibility}
@@ -165,7 +171,31 @@ const FileSelector = () => {
           ref={rightPanelRef}
           class="flex-grow flex flex-col overflow-hidden bg-dark-background"
         >
-          <div class="flex-grow overflow-auto bg-dark-background text-xs p-2">
+          {/* View Toggle */}
+          <div class="flex py-4 px-4 border-b border-dark-border">
+            <button
+              class={`px-4 py-2 rounded-l-md  border border-dark-border ${
+                viewMode() === "code"
+                  ? "bg-dark-border text-white"
+                  : "bg-dark-background text-dark-text"
+              }`}
+              onClick={() => setViewMode("code")}
+            >
+              Code
+            </button>
+            <button
+              class={`px-4 py-2 rounded-r-md border border-dark-border ${
+                viewMode() === "output"
+                  ? "bg-dark-border text-white"
+                  : "bg-dark-background text-dark-text"
+              }`}
+              onClick={() => setViewMode("output")}
+            >
+              Output
+            </button>
+          </div>
+
+          <div class="flex-grow overflow-auto bg-dark-background ">
             <Show
               when={!isFileLoading() && !isOutputLoading()}
               fallback={
@@ -174,21 +204,21 @@ const FileSelector = () => {
                 </div>
               }
             >
-              <Show
-                when={viewMode() === "code"}
-                fallback={
+              <Switch>
+                <Match when={viewMode() === "code"}>
+                  <CodeViewer
+                    selectedFile={selectedFile}
+                    fileContent={fileContent}
+                    currentLanguage={currentLanguage}
+                  />
+                </Match>
+                <Match when={viewMode() === "output"}>
                   <OutputViewer
                     outputFormat={outputFormat}
                     generatedOutput={generatedOutput}
                   />
-                }
-              >
-                <CodeViewer
-                  selectedFile={selectedFile}
-                  fileContent={fileContent}
-                  currentLanguage={currentLanguage}
-                />
-              </Show>
+                </Match>
+              </Switch>
             </Show>
           </div>
         </div>

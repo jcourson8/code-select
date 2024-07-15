@@ -48,14 +48,18 @@ export function useFileSelector() {
     }
   };
 
-  const selectFile = async (item: FileItem, e: MouseEvent) => {
-    e.stopPropagation();
-    if (item.type === 'file') {
+  const selectFile = async (item: FileItem | null) => {
+    if (item && item.type === 'file') {
       setSelectedFile(item.path);
       setIsLoading(true);
       const content = await getItemContent(item);
       setFileContent(content);
+      setCurrentLanguage(getLanguageFromFilename(item.name));
       setIsLoading(false);
+    } else {
+      setSelectedFile(null);
+      setFileContent('');
+      setCurrentLanguage('plaintext');
     }
   };
 
@@ -103,3 +107,4 @@ export function useFileSelector() {
     toggleOutputVisibility,
   };
 }
+

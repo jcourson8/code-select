@@ -36,21 +36,29 @@ const extensionToLanguage: Record<string, string> = Object.fromEntries(
   languageConfig.map(({ extension, language }) => [extension, language])
 );
 
-const getFileExtension = (filename: string): string => {
+export const getFileExtension = (filename: string): string => {
   const parts = filename.split('.');
   return parts.length > 1 ? parts.pop()!.toLowerCase() : '';
 };
 
-const getLanguageFromFilename = (filename: string): string => {
+export const getLanguageFromFilename = (filename: string): string => {
   const extension = getFileExtension(filename);
   return extensionToLanguage[extension] || 'plaintext';
 };
 
-const highlightCode = (code: string, language: string): string => {
+export const highlightCode = (code: string, language: string): string => {
   if (Prism.languages[language]) {
     return Prism.highlight(code, Prism.languages[language], language);
   }
-  return code; // Fallback to plain text if language is not supported
+  return code;
 };
 
-export { getLanguageFromFilename, highlightCode };
+export const highlightMarkdown = (content: string): string => {
+  return content.replace(
+    /(```(\w+)?\n)([\s\S]*?)(```)/g,
+    (match, opening, language, code, closing) => {
+      const highlightedCode = highlightCode(code, language || 'plaintext');
+      return `${opening}${highlightedCode}${closing}`;
+    }
+  );
+};

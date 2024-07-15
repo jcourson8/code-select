@@ -23,6 +23,7 @@
     "prismjs": "^1.29.0",
     "solid-highlight": "^0.1.26",
     "solid-icons": "^1.1.0",
-    "solid-js": "^1.8.18"
+    "solid-js": "^1.8.18",
+    "solid-markdown": "^2.0.13"
   }
 }

@@ -20,7 +20,7 @@ const OutputViewer = (props: OutputViewerProps) => {
       <Show
         when={processedContent()}
         fallback={
-          <code class="text-dark-textMuted">Select a folder to begin...</code>
+          <code class="text-dark-textMuted">Choose a folder to begin...</code>
         }
       >
         <pre>

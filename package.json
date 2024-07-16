@@ -20,6 +20,7 @@
     "vite-plugin-solid": "^2.8.2"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.3.1",
     "prismjs": "^1.29.0",
     "solid-highlight": "^0.1.26",
     "solid-icons": "^1.1.0",

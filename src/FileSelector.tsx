@@ -120,7 +120,7 @@ const FileSelector = () => {
           {/* Folder Selection */}
           <div class="flex-shrink-0 p-2 hover:bg-dark-buttonHover cursor-pointer transition-colors flex justify-between items-center">
             <label for="folder-upload" class="flex items-center rounded">
-              <span class="text-dark-text">Choose a folder</span>
+              <span class="ml-2 text-dark-text">Choose a folder</span>
               <input
                 id="folder-upload"
                 type="file"

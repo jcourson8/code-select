@@ -118,23 +118,24 @@ const FileSelector = () => {
           style={{ width: `${dividerPos()}%` }}
         >
           {/* Folder Selection */}
-          <div class="flex-shrink-0 p-2 hover:bg-dark-buttonHover cursor-pointer transition-colors flex justify-between items-center">
-            <label for="folder-upload" class="flex items-center rounded">
-              <span class="ml-2 text-dark-text">Choose a folder</span>
-              <input
-                id="folder-upload"
-                type="file"
-                onChange={(e) => {
-                  const files = (e.target as HTMLInputElement).files;
-                  if (files) handleFileUpload(files);
-                }}
-                webkitdirectory
-                directory
-                multiple
-                class="hidden"
-              />
-            </label>
-          </div>
+          <label
+            for="folder-upload"
+            class="flex-shrink-0 p-2 hover:bg-dark-buttonHover cursor-pointer transition-colors flex justify-between items-center"
+          >
+            <span class="ml-2 text-dark-text">Choose a folder</span>
+            <input
+              id="folder-upload"
+              type="file"
+              onChange={(e) => {
+                const files = (e.target as HTMLInputElement).files;
+                if (files) handleFileUpload(files);
+              }}
+              webkitdirectory
+              directory
+              multiple
+              class="hidden"
+            />
+          </label>
 
           {/* File Tree */}
           <FileTree

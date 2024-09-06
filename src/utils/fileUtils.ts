@@ -14,8 +14,10 @@ export const isExcluded = (path: string): boolean => {
   const fileName = path.split("/").pop()!;
   return excludedPatterns.some((pattern) => {
     if (pattern.startsWith("*")) {
+      // Exclude based on file extension patterns like *.exe, *.dll
       return fileName.endsWith(pattern.slice(1));
     }
+    // Exclude entire directories like node_modules, bin
     return path.includes(pattern);
   });
 };
@@ -28,6 +30,7 @@ export const parseFileStructure = (files: FileList): FileItem[] => {
     let path = "";
     parts.forEach((part, index) => {
       path += (index > 0 ? "/" : "") + part;
+      // Check exclusion before pushing the file/folder into the result array
       if (!result.find((item) => item.path === path)) {
         const excluded = isExcluded(path);
         result.push({
@@ -41,7 +44,10 @@ export const parseFileStructure = (files: FileList): FileItem[] => {
       }
     });
   }
-  return result.sort((a, b) => a.path.localeCompare(b.path));
+  // Sort and return the result while ignoring excluded files and folders
+  return result
+    .filter(item => !item.excluded)
+    .sort((a, b) => a.path.localeCompare(b.path));
 };
 
 export const getItemContent = async (item: FileItem): Promise<string> => {

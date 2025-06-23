@@ -1,6 +1,7 @@
 import { FiChevronRight, FiFile } from 'solid-icons/fi';
+import { AiOutlineExpandAlt } from 'solid-icons/ai';
 import CustomCheckbox from './CustomCheckbox';
-import { Accessor } from 'solid-js';
+import { Accessor, Show } from 'solid-js';
 import { FileItem as FileItemType } from '../hooks/useFileSelector';
 import VisibilityToggle from './VisibilityToggle';
 
@@ -14,6 +15,7 @@ interface FileItemProps {
   onToggleFolder: (e: MouseEvent) => void;
   onToggleSelection: () => void;
   onToggleOutputVisibility: () => void;
+  onExpandAllSubfolders: () => void;
 }
 
 const FileItem = (props: FileItemProps) => {
@@ -45,7 +47,7 @@ const FileItem = (props: FileItemProps) => {
         <FiFile size={16} class="text-dark-text" />
       )}
       <span class="ml-2 flex-grow">{props.item.name}</span>
-      <div class="flex-shrink-0 flex items-center">
+      <div class="flex-shrink-0 flex items-center gap-1">
         <CustomCheckbox
           checked={() => props.selectedItems()[props.item.path]}
           onChange={props.onToggleSelection}
@@ -54,6 +56,18 @@ const FileItem = (props: FileItemProps) => {
           visible={() => props.outputVisibleItems()[props.item.path]}
           onChange={props.onToggleOutputVisibility}
         />
+        <Show when={props.item.type === 'folder'}>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onExpandAllSubfolders();
+            }}
+            class="p-1 text-dark-text rounded hover:bg-dark-buttonHover opacity-50 hover:opacity-100 transition-opacity"
+            title="Expand all subfolders"
+          >
+            <AiOutlineExpandAlt size={12} />
+          </button>
+        </Show>
       </div>
     </div>
   );

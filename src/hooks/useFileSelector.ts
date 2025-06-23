@@ -97,6 +97,21 @@ export function useFileSelector() {
     });
   };
 
+  const expandAllSubfolders = (folderPath: string) => {
+    setExpandedFolders((prev) => {
+      const newExpanded = { ...prev };
+      // First expand the target folder itself
+      newExpanded[folderPath] = true;
+      // Then expand all its subfolders
+      items().forEach((item) => {
+        if (item.type === 'folder' && item.path.startsWith(folderPath + '/')) {
+          newExpanded[item.path] = true;
+        }
+      });
+      return newExpanded;
+    });
+  };
+
   createEffect(() => {
     if (selectedFile()) {
       setCurrentLanguage(getLanguageFromFilename(selectedFile()!));
@@ -118,6 +133,7 @@ export function useFileSelector() {
     toggleSelection,
     toggleOutputVisibility,
     expandAll,
+    expandAllSubfolders,
   };
 }
 

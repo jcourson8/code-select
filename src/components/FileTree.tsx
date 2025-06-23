@@ -12,6 +12,7 @@ interface FileTreeProps {
   onToggleFolder: (item: FileItemType, e: MouseEvent) => void;
   onToggleSelection: (item: FileItemType) => void;
   onToggleOutputVisibility: (item: FileItemType) => void;
+  onExpandAllSubfolders: (folderPath: string) => void;
   isVisuallyVisible: (item: FileItemType) => boolean;
 }
 
@@ -31,6 +32,7 @@ const FileTree = (props: FileTreeProps) => {
               onToggleFolder={(e: MouseEvent) => props.onToggleFolder(item, e)}
               onToggleSelection={() => props.onToggleSelection(item)}
               onToggleOutputVisibility={() => props.onToggleOutputVisibility(item)}
+              onExpandAllSubfolders={() => props.onExpandAllSubfolders(item.path)}
             />
           </Show>
         )}

@@ -31,6 +31,7 @@ const FileSelector = () => {
     toggleSelection,
     toggleOutputVisibility,
     expandAll,
+    expandAllSubfolders,
   } = useFileSelector();
 
   const {
@@ -149,6 +150,7 @@ const FileSelector = () => {
             onToggleFolder={toggleFolder}
             onToggleSelection={toggleSelection}
             onToggleOutputVisibility={toggleOutputVisibility}
+            onExpandAllSubfolders={expandAllSubfolders}
             isVisuallyVisible={isVisuallyVisible}
           />
 

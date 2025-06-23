@@ -85,6 +85,18 @@ export function useFileSelector() {
     }));
   };
 
+  const expandAll = () => {
+    setExpandedFolders((prev) => {
+      const newExpanded = { ...prev };
+      items().forEach((item) => {
+        if (item.type === 'folder') {
+          newExpanded[item.path] = true;
+        }
+      });
+      return newExpanded;
+    });
+  };
+
   createEffect(() => {
     if (selectedFile()) {
       setCurrentLanguage(getLanguageFromFilename(selectedFile()!));
@@ -105,6 +117,7 @@ export function useFileSelector() {
     selectFile,
     toggleSelection,
     toggleOutputVisibility,
+    expandAll,
   };
 }
 

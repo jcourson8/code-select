@@ -30,6 +30,7 @@ const FileSelector = () => {
     selectFile,
     toggleSelection,
     toggleOutputVisibility,
+    expandAll,
   } = useFileSelector();
 
   const {
@@ -157,6 +158,7 @@ const FileSelector = () => {
             onCopy={copyToClipboard}
             onToggleOutputFormat={toggleOutputFormat}
             isCopyLoading={isCopyLoading}
+            onExpandAll={expandAll}
           />
         </div>
 

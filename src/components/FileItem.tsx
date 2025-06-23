@@ -48,15 +48,7 @@ const FileItem = (props: FileItemProps) => {
       )}
       <span class="ml-2 flex-grow">{props.item.name}</span>
       <div class="flex-shrink-0 flex items-center gap-1">
-        <CustomCheckbox
-          checked={() => props.selectedItems()[props.item.path]}
-          onChange={props.onToggleSelection}
-        />
-        <VisibilityToggle
-          visible={() => props.outputVisibleItems()[props.item.path]}
-          onChange={props.onToggleOutputVisibility}
-        />
-        <Show when={props.item.type === 'folder'}>
+      <Show when={props.item.type === 'folder'}>
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -68,6 +60,14 @@ const FileItem = (props: FileItemProps) => {
             <AiOutlineExpandAlt size={12} />
           </button>
         </Show>
+        <CustomCheckbox
+          checked={() => props.selectedItems()[props.item.path]}
+          onChange={props.onToggleSelection}
+        />
+        <VisibilityToggle
+          visible={() => props.outputVisibleItems()[props.item.path]}
+          onChange={props.onToggleOutputVisibility}
+        />
       </div>
     </div>
   );

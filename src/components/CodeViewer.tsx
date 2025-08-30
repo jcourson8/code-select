@@ -21,7 +21,7 @@ const CodeViewer = (props: CodeViewerProps) => {
         </div>
       }
     >
-      <pre class={`language-${props.currentLanguage()}`}>
+      <pre class={`language-${props.currentLanguage()} p-4 m-0 bg-dark-background text-sm overflow-auto`}>
         <code
           innerHTML={highlightCode(props.fileContent(), props.currentLanguage())}
         />

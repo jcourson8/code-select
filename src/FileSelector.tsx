@@ -1,10 +1,12 @@
-import { createSignal, Match, Show, Switch } from "solid-js";
+import { createSignal, Match, Show, Switch, onCleanup, createEffect } from "solid-js";
 import OutputViewer from "./components/OutputViewer";
 import FileTree from "./components/FileTree";
 import CodeViewer from "./components/CodeViewer";
 import ControlPanel from "./components/ControlPanel";
+import RepoInput from "./components/RepoInput";
 import { FileItem, useFileSelector } from "./hooks/useFileSelector";
 import { useOutputGenerator } from "./hooks/useOutputGenerator";
+import { useGitHubRepo } from "./hooks/useGitHubRepo";
 
 declare module "solid-js" {
   namespace JSX {
@@ -32,7 +34,16 @@ const FileSelector = () => {
     toggleOutputVisibility,
     expandAll,
     expandAllSubfolders,
+    setItemsFromSandbox,
+    sandboxFileReader,
   } = useFileSelector();
+
+  const {
+    cloneState,
+    cloneRepository,
+    readFileFromSandbox,
+    cleanup,
+  } = useGitHubRepo();
 
   const {
     outputFormat,
@@ -46,12 +57,15 @@ const FileSelector = () => {
     items,
     selectedItems,
     outputVisibleItems,
-    expandedFolders
+    expandedFolders,
+    sandboxFileReader
   );
 
   const [dividerPos, setDividerPos] = createSignal(33);
 
   const [viewMode, setViewMode] = createSignal<"code" | "output">("output");
+  
+  const [sourceMode, setSourceMode] = createSignal<"local" | "github">("local");
 
   const handleFileSelection = (item: FileItem) => {
     if (item.type === "file") {
@@ -66,6 +80,29 @@ const FileSelector = () => {
       }
     }
   };
+
+  const handleCloneRepo = async (repoUrl: string) => {
+    try {
+      const fileItems = await cloneRepository(repoUrl);
+      setItemsFromSandbox(fileItems, readFileFromSandbox);
+      setViewMode("output"); // Switch to output view after cloning
+    } catch (error) {
+      console.error('Error cloning repository:', error);
+    }
+  };
+
+  // Cleanup repo data when switching from github to local mode
+  createEffect(() => {
+    const mode = sourceMode();
+    if (mode === "local" && cloneState().repoData) {
+      cleanup();
+    }
+  });
+
+  // Cleanup repo data when component unmounts
+  onCleanup(() => {
+    cleanup();
+  });
 
   const toggleViewMode = () => {
     setViewMode((prev) => (prev === "code" ? "output" : "code"));
@@ -119,25 +156,59 @@ const FileSelector = () => {
           class="flex-shrink-0 flex flex-col border-r border-dark-border overflow-hidden bg-dark-background"
           style={{ width: `${dividerPos()}%` }}
         >
-          {/* Folder Selection */}
-          <label
-            for="folder-upload"
-            class="flex-shrink-0 p-2 hover:bg-dark-buttonHover cursor-pointer transition-colors flex justify-between items-center"
-          >
-            <span class="ml-2 text-dark-text">Choose a folder</span>
-            <input
-              id="folder-upload"
-              type="file"
-              onChange={(e) => {
-                const files = (e.target as HTMLInputElement).files;
-                if (files) handleFileUpload(files);
-              }}
-              webkitdirectory
-              directory
-              multiple
-              class="hidden"
+          {/* Source Mode Toggle */}
+          <div class="flex-shrink-0 flex border-b border-dark-border">
+            <button
+              class={`flex-1 px-3 py-2 text-xs transition-colors ${
+                sourceMode() === "local"
+                  ? "text-dark-text border-b-2 border-dark-accent"
+                  : "text-gray-500 hover:text-dark-text"
+              }`}
+              onClick={() => setSourceMode("local")}
+            >
+              Local
+            </button>
+            <button
+              class={`flex-1 px-3 py-2 text-xs transition-colors ${
+                sourceMode() === "github"
+                  ? "text-dark-text border-b-2 border-dark-accent"
+                  : "text-gray-500 hover:text-dark-text"
+              }`}
+              onClick={() => setSourceMode("github")}
+            >
+              GitHub
+            </button>
+          </div>
+
+          {/* Dynamic Input Section */}
+          <Show when={sourceMode() === "local"}>
+            <label
+              for="folder-upload"
+              class="flex-shrink-0 p-2 hover:bg-dark-buttonHover cursor-pointer transition-colors flex justify-between items-center"
+            >
+              <span class="ml-2 text-dark-text">Choose a folder</span>
+              <input
+                id="folder-upload"
+                type="file"
+                onChange={(e) => {
+                  const files = (e.target as HTMLInputElement).files;
+                  if (files) handleFileUpload(files);
+                }}
+                webkitdirectory
+                directory
+                multiple
+                class="hidden"
+              />
+            </label>
+          </Show>
+
+          <Show when={sourceMode() === "github"}>
+            <RepoInput
+              onCloneRepo={handleCloneRepo}
+              isCloning={cloneState().isCloning}
+              error={cloneState().error}
             />
-          </label>
+          </Show>
 
           {/* File Tree */}
           <FileTree
@@ -161,6 +232,8 @@ const FileSelector = () => {
             onToggleOutputFormat={toggleOutputFormat}
             isCopyLoading={isCopyLoading}
             onExpandAll={expandAll}
+            viewMode={viewMode}
+            onToggleViewMode={toggleViewMode}
           />
         </div>
 
@@ -176,29 +249,7 @@ const FileSelector = () => {
           ref={rightPanelRef}
           class="flex-grow flex flex-col overflow-hidden bg-dark-background"
         >
-          {/* View Toggle */}
-          <div class="flex py-4 px-4 border-b border-dark-border">
-            <button
-              class={`px-4 py-2 rounded-l-md  border border-dark-border ${
-                viewMode() === "code"
-                  ? "bg-dark-border text-white"
-                  : "bg-dark-background text-dark-text"
-              }`}
-              onClick={() => setViewMode("code")}
-            >
-              Code
-            </button>
-            <button
-              class={`px-4 py-2 rounded-r-md border border-dark-border ${
-                viewMode() === "output"
-                  ? "bg-dark-border text-white"
-                  : "bg-dark-background text-dark-text"
-              }`}
-              onClick={() => setViewMode("output")}
-            >
-              Output
-            </button>
-          </div>
+
 
           <div class="flex-grow overflow-auto bg-dark-background ">
             <Show

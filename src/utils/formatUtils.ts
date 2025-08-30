@@ -30,7 +30,8 @@ export const generateOutput = async (
   items: Accessor<FileItem[]>,
   selectedItems: Accessor<Record<string, boolean>>,
   outputVisibleItems: Accessor<Record<string, boolean>>,
-  expandedFolders: Accessor<Record<string, boolean>>
+  expandedFolders: Accessor<Record<string, boolean>>,
+  fileReader?: (path: string) => Promise<string>
 ): Promise<string> => {
   let output = "";
   const processItem = async (item: FileItem, indent = ""): Promise<void> => {
@@ -39,7 +40,7 @@ export const generateOutput = async (
         output += `${indent}- ${item.name} (${item.path})\n`;
 
         if (selectedItems()[item.path] && item.type === "file") {
-          const content = await getItemContent(item);
+          const content = fileReader ? await fileReader(item.path) : await getItemContent(item);
           const extension = getFileExtension(item.name);
           output += `${indent}  \`\`\`${extension}\n${content}\n${indent}  \`\`\`\n`;
         }
@@ -48,7 +49,7 @@ export const generateOutput = async (
         output += `${indent}<${tag} name="${escapeXml(item.name)}" path="${escapeXml(item.path)}">\n`;
 
         if (selectedItems()[item.path] && item.type === "file") {
-          const content = await getItemContent(item);
+          const content = fileReader ? await fileReader(item.path) : await getItemContent(item);
           output += `${indent}  <content><![CDATA[${content}]]></content>\n`;
         }
       }

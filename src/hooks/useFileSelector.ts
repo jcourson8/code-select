@@ -21,6 +21,7 @@ export function useFileSelector() {
   const [fileContent, setFileContent] = createSignal<string>('');
   const [currentLanguage, setCurrentLanguage] = createSignal<string>('javascript');
   const [isLoading, setIsLoading] = createSignal<boolean>(false);
+  const [sandboxFileReader, setSandboxFileReader] = createSignal<((path: string) => Promise<string>) | null>(null);
 
   const handleFileUpload = (files: FileList) => {
     const parsedItems = parseFileStructure(files);
@@ -36,6 +37,29 @@ export function useFileSelector() {
     setExpandedFolders(initialExpanded);
     setOutputVisibleItems(initialOutputVisible);
     setSelectedItems(initialSelected);
+    setSandboxFileReader(null); // Clear sandbox reader for local files
+  };
+
+  const setItemsFromSandbox = (fileItems: FileItem[], fileReader: (path: string) => Promise<string>) => {
+    setItems(fileItems);
+    setSandboxFileReader(() => fileReader);
+    
+    const initialExpanded: Record<string, boolean> = {};
+    const initialOutputVisible: Record<string, boolean> = {};
+    const initialSelected: Record<string, boolean> = {};
+    fileItems.forEach((item) => {
+      if (item.type === 'folder') initialExpanded[item.path] = false;
+      initialOutputVisible[item.path] = !item.excluded;
+      initialSelected[item.path] = false;
+    });
+    setExpandedFolders(initialExpanded);
+    setOutputVisibleItems(initialOutputVisible);
+    setSelectedItems(initialSelected);
+    
+    // Clear currently selected file when switching to sandbox
+    setSelectedFile(null);
+    setFileContent('');
+    setCurrentLanguage('plaintext');
   };
 
   const toggleFolder = (item: FileItem, e: MouseEvent) => {
@@ -52,9 +76,27 @@ export function useFileSelector() {
     if (item && item.type === 'file') {
       setSelectedFile(item.path);
       setIsLoading(true);
-      const content = await getItemContent(item);
-      setFileContent(content);
-      setCurrentLanguage(getLanguageFromFilename(item.name));
+      
+      try {
+        let content = '';
+        const reader = sandboxFileReader();
+        
+        if (reader) {
+          // Reading from sandbox
+          content = await reader(item.path);
+        } else {
+          // Reading from local file
+          content = await getItemContent(item);
+        }
+        
+        setFileContent(content);
+        setCurrentLanguage(getLanguageFromFilename(item.name));
+      } catch (error) {
+        console.error('Error reading file:', error);
+        setFileContent('Error reading file');
+        setCurrentLanguage('plaintext');
+      }
+      
       setIsLoading(false);
     } else {
       setSelectedFile(null);
@@ -134,6 +176,8 @@ export function useFileSelector() {
     toggleOutputVisibility,
     expandAll,
     expandAllSubfolders,
+    setItemsFromSandbox,
+    sandboxFileReader,
   };
 }
 
